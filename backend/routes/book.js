@@ -5,13 +5,13 @@ const router = express.Router();
 
 const bookController = require('../controllers/book');
 // get books
-router.get('/', auth, bookController.getBooks);
+router.get('/', bookController.getBooks);
 // get one book
-router.get('/:id', auth, bookController.getOneBook);
+router.get('/:id', bookController.getOneBook);
 // create book
 router.post('/', auth, multer, bookController.createBook);
 //modify book 
-router.put('/:id', auth, bookController.modifyBook);
+router.put('/:id', auth, multer, bookController.modifyBook);
 //delete a book
 router.delete('/:id', auth, bookController.deleteBook);
 

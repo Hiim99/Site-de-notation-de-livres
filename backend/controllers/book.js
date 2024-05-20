@@ -14,16 +14,18 @@ exports.createBook = (req, res, next) => {
     .then(() => { res.status(201).json({message: 'Objet enregistré !'})})
     .catch(error => { res.status(400).json( { error })})
 };
+
 exports.getBooks = (req, res, next) => {
-    //to doo dodoododo  
+    console.log('getBooks called');
+    Book.find()
+    .then(books => {
+        res.status(200).json(books);
+    })
+    .catch(error => { 
+        res.status(400).json({ error });
+    });
 };
 exports.modifyBook = (req, res, next) => {
-    //to doo dodoododo  
-};
-exports.getBooks = (req, res, next) => {
-    //to doo dodoododo  
-};
-exports.getBooks = (req, res, next) => {
     //to doo dodoododo  
 };
 exports.getOneBook = (req, res, next) => {

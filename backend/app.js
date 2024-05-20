@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bookRoutes = require('./routes/book');
 const userRoutes = require('./routes/user');
 const path = require('path');
+const Book = require('./models/book');
 
 
 mongoose.connect('mongodb+srv://Fadoua:Fboulehj123@cluster0.fh3i4ws.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
@@ -20,6 +21,8 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
+
 
 app.use('/api/book', bookRoutes);
 app.use('/api/auth', userRoutes);
