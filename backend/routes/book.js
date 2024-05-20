@@ -1,5 +1,6 @@
 const express = require('express');
 const auth = require('../middleware/auth');
+const multer = require('../middleware/multerConfig'); // Positionner après auth sinon on pourra rajouter des photos même si on est pas connecté
 const router = express.Router();
 
 const bookController = require('../controllers/book');
@@ -8,7 +9,7 @@ router.get('/', auth, bookController.getBooks);
 // get one book
 router.get('/:id', auth, bookController.getOneBook);
 // create book
-router.post('/', auth, bookController.createBook);
+router.post('/', auth, multer, bookController.createBook);
 //modify book 
 router.put('/:id', auth, bookController.modifyBook);
 //delete a book

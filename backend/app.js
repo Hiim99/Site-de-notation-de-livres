@@ -4,6 +4,7 @@ app.use(express.json());
 const mongoose = require('mongoose');
 const bookRoutes = require('./routes/book');
 const userRoutes = require('./routes/user');
+const path = require('path');
 
 
 mongoose.connect('mongodb+srv://Fadoua:Fboulehj123@cluster0.fh3i4ws.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
@@ -22,5 +23,7 @@ app.use((req, res, next) => {
 
 app.use('/api/book', bookRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 module.exports = app;
