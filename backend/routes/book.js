@@ -9,10 +9,12 @@ router.get('/', bookController.getBooks);
 // get one book
 router.get('/:id', bookController.getOneBook);
 // create book
-router.post('/', auth, multer, bookController.createBook);
+router.post('/', auth, multer.single('image'), bookController.createBook);
 //modify book 
-router.put('/:id', auth, multer, bookController.modifyBook);
+router.put('/:id', auth, multer.single('image'), bookController.modifyBook);
 //delete a book
 router.delete('/:id', auth, bookController.deleteBook);
+//Noter un livre
+router.post('/:id/rating', auth, bookController.rateBook);
 
 module.exports = router;

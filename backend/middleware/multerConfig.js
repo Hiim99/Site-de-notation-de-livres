@@ -1,20 +1,26 @@
 const multer = require('multer');
-
-const MIME_TYPES = {
-  'image/jpg': 'jpg',
-  'image/jpeg': 'jpg',
-  'image/png': 'png'
-};
+const path = require('path');
 
 const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, 'images');
+  destination: (req, file, cb) => {
+    cb(null, 'images'); 
   },
-  filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_');
-    const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + '.' + extension);
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
-module.exports = multer({storage: storage}).single('image');
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb('Error: Images Only!');
+  }
+});
+
+module.exports = upload;
