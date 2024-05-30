@@ -4,6 +4,9 @@ const multer = require('../middleware/multerConfig'); // Positionner après auth
 const router = express.Router();
 
 const bookController = require('../controllers/book');
+
+// get best rated books
+router.get('/bestrating', bookController.getBestRatedBooks);
 // get books
 router.get('/', bookController.getBooks);
 // get one book

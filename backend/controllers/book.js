@@ -19,15 +19,11 @@ exports.createBook = (req, res, next) => {
             if (err) {
                 return res.status(500).json({ error: err });
             }
-
-            fs.unlinkSync(filePath);
-
             const book = new Book({
                 ...bookObject,
                 userId: req.auth.userId,
                 imageUrl: `${req.protocol}://${req.get('host')}/${compressedFilePath}`
             });
-
             book.save()
                 .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
                 .catch(error => { res.status(400).json({ error }) });
@@ -93,7 +89,7 @@ exports.deleteBook = (req, res, next) => {
                 res.status(500).json({ error });
         });
 };
-// Donner une note à un livre
+// Donner une note à un livre et display the la nouvelle note moyenne 
 exports.rateBook = (req, res, next) => {
     const { userId, rating } = req.body;
     const bookId = req.params.id;
@@ -113,9 +109,18 @@ exports.rateBook = (req, res, next) => {
         const newRatings =  [...book.ratings,{ userId: userId, grade: rating }]
         const totalRatings = newRatings.length;
         const totalGrade = newRatings.reduce((sum, rating) => sum + rating.grade, 0);
-        book.updateOne({ratings: newRatings, averageRating: totalGrade / totalRatings})
-          .then(() => res.status(200).json({ message: 'Rating added', book: book}))
+        const newAverageRating = totalGrade / totalRatings;
+        book.updateOne({ratings: newRatings, averageRating: newAverageRating})
+          .then(() => res.status(200).json({_id : book._id , userId : book.userId , title: book.title , author : book.author , imageUrl : book.imageUrl , year : book.year , genre: book.genre , ratings : newRatings , averageRating : newAverageRating}))
           .catch(error => res.status(500).json({ error }));
       })
       .catch(error => res.status(500).json({ error }));
   };
+
+
+// les 3 livres les mieux notés 
+exports.getBestRatedBooks = (req, res, next) => {
+    Book.find().sort({ averageRating: -1 }).limit(3)
+    .then(books => res.status(200).json(books))
+    .catch(error => res.status(400).json({ error }));
+};
