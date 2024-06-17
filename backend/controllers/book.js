@@ -1,5 +1,6 @@
 const fs = require('fs');
 const sharp = require('sharp');
+const path = require('path');
 const Book = require('../models/book');
 
 //Ajout d'un livre 
@@ -46,22 +47,32 @@ exports.modifyBook = (req, res, next) => {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-  
+
     delete bookObject._userId;
-    Book.findOne({_id: req.params.id})
+    Book.findOne({ _id: req.params.id })
         .then((book) => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : 'Not authorized'});
-            } else {
-                Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : 'Objet modifié!'}))
-                .catch(error => res.status(401).json({ error }));
+                return res.status(401).json({ message: 'Not authorized' });
             }
+
+            // If a new image is uploaded, delete the old image
+            if (req.file) {
+                const oldFilename = book.imageUrl.split('images/')[1];
+                fs.unlink(path.join('images', oldFilename), (err) => {
+                    if (err) {
+                        console.error('Failed to delete old image:', err);
+                    }
+                });
+            }
+
+            Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                .catch(error => res.status(401).json({ error }));
         })
         .catch((error) => {
             res.status(400).json({ error });
         });
- };
+};
 
 // Récuperer un livre (page de détails) 
 exports.getOneBook = (req, res, next) => {
