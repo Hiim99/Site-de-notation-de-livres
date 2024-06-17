@@ -94,28 +94,28 @@ exports.rateBook = (req, res, next) => {
     const { userId, rating } = req.body;
     const bookId = req.params.id;
     if (rating < 0 || rating > 5) {
-      return res.status(400).json({ message: 'Grade must be between 0 and 5.' });
+        return res.status(400).json({ message: 'Grade must be between 0 and 5.' });
     }
     Book.findById(bookId)
-      .then(book => {
-        if (!book) {
-          return res.status(404).json({ message: 'Book not found' });
-        }
+        .then(book => {
+            if (!book) {
+                return res.status(404).json({ message: 'Book not found' });
+            }
 
-        const existingRating = book.ratings.find(rating => rating.userId === userId);
-        if (existingRating) {
-          return res.status(400).json({ message: 'User has already rated this book.' });
-        }
-        const newRatings =  [...book.ratings,{ userId: userId, grade: rating }]
-        const totalRatings = newRatings.length;
-        const totalGrade = newRatings.reduce((sum, rating) => sum + rating.grade, 0);
-        const newAverageRating = totalGrade / totalRatings;
-        book.updateOne({ratings: newRatings, averageRating: newAverageRating})
-          .then(() => res.status(200).json({_id : book._id , userId : book.userId , title: book.title , author : book.author , imageUrl : book.imageUrl , year : book.year , genre: book.genre , ratings : newRatings , averageRating : newAverageRating}))
-          .catch(error => res.status(500).json({ error }));
-      })
-      .catch(error => res.status(500).json({ error }));
-  };
+            const existingRating = book.ratings.find(rating => rating.userId === userId);
+            if (existingRating) {
+                return res.status(400).json({ message: 'User has already rated this book.' });
+            }
+            const newRatings = [...book.ratings, { userId: userId, grade: rating }];
+            const totalRatings = newRatings.length;
+            const totalGrade = newRatings.reduce((sum, rating) => sum + rating.grade, 0);
+            const newAverageRating = Math.round(totalGrade / totalRatings); // Round to the nearest integer
+            book.updateOne({ ratings: newRatings, averageRating: newAverageRating })
+                .then(() => res.status(200).json({ _id: book._id, userId: book.userId, title: book.title, author: book.author, imageUrl: book.imageUrl, year: book.year, genre: book.genre, ratings: newRatings, averageRating: newAverageRating }))
+                .catch(error => res.status(500).json({ error }));
+        })
+        .catch(error => res.status(500).json({ error }));
+};
 
 
 // les 3 livres les mieux notés 
